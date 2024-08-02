@@ -48,12 +48,14 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
   id-token: write
   actions: read
   checks: write
+  issues: write  # Ensure this is added
 
 jobs:
   terraform:
