@@ -103,6 +103,11 @@ jobs:
       env:
         TF_LOG: ERROR
 
+    - name: Terraform Validate
+      run: terraform validate
+      env:
+        TF_LOG: ERROR
+        
     # Checks that all Terraform configuration files adhere to a canonical format
     #- name: Terraform Format
     #  run: terraform fmt -check
