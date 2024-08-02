@@ -1,6 +1,6 @@
 resource "null_resource" "name" {
     triggers = {
-      value = "Does nothing"
+      value = var.displaymsg
     }
   
 }
