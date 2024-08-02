@@ -107,7 +107,6 @@ jobs:
             const fs = require('fs');
             const planOutput = fs.readFileSync('plan.json', 'utf8');
             const comment = `### Terraform Plan Result\n\`\`\`json\n${planOutput}\n\`\`\``;
-            const { context } = require('@actions/github');
             const issue_number = context.payload.pull_request.number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
