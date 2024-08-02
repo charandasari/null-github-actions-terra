@@ -46,11 +46,14 @@ name: 'null resource using Terraform'
 
 on:
   push:
-    branches: [ main]
+    branches: [main]
   pull_request:
 
 permissions:
   contents: read
+  id-token: write
+  actions: read
+  checks: write
 
 jobs:
   terraform:
@@ -86,9 +89,34 @@ jobs:
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform plan -input=false
+      run: terraform plan -input=false -out=tfplan
       env:
         TF_LOG: ERROR
+
+    - name: Save Terraform Plan Output
+      if: github.event_name == 'pull_request'
+      run: terraform show -json tfplan > plan.json
+      env:
+        TF_LOG: ERROR
+
+    - name: Create PR Comment with Plan Output
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+            const fs = require('fs');
+            const planOutput = fs.readFileSync('plan.json', 'utf8');
+            const comment = `### Terraform Plan Result\n\`\`\`json\n${planOutput}\n\`\`\``;
+            const { context } = require('@actions/github');
+            const issue_number = context.payload.pull_request.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: comment,
+            });
 
       # On push to "main", build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
