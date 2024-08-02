@@ -97,6 +97,7 @@ jobs:
       run: terraform apply -auto-approve -input=false
       env:
         TF_LOG: ERROR
+    
 
         
 
